@@ -412,6 +412,32 @@
             }
         }
 
+        .card.is-rare {
+            border-color: #ff00ff;
+            animation: rarePulse 2s infinite, cardFlip 0.6s ease-out;
+        }
+
+        .card.is-rare::before {
+            background: linear-gradient(45deg, #ff00ff, #ff1493, #8a2be2, #ff00ff);
+            animation: rareGlow 2s linear infinite;
+        }
+
+        @keyframes rareGlow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        @keyframes rarePulse {
+            0%, 100% {
+                box-shadow: 0 0 30px #ff00ff, 0 0 60px #ff00ff;
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 50px #ff00ff, 0 0 100px #ff00ff;
+                transform: scale(1.05);
+            }
+        }
+
         .card-count {
             position: absolute;
             bottom: 10px;
@@ -589,6 +615,16 @@
             border-color: #ffd700;
         }
 
+        .collection-card.rare {
+            border-color: #ff00ff;
+            animation: rareBorderGlow 3s infinite;
+        }
+
+        @keyframes rareBorderGlow {
+            0%, 100% { border-color: #ff00ff; box-shadow: 0 0 10px #ff00ff; }
+            50% { border-color: #8a2be2; box-shadow: 0 0 20px #8a2be2; }
+        }
+
         .collection-card img {
             width: 100%;
             height: 160px;
@@ -602,6 +638,22 @@
             font-weight: bold;
             color: #ffd700;
         }
+
+        .collection-card .card-label.rare {
+            color: #ff00ff;
+        }
+
+        .rare-indicator {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: linear-gradient(45deg, #ff00ff, #8a2be2);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -609,6 +661,7 @@
         <header>
             <h1>Jeu de Collection de Cartes</h1>
             <p class="subtitle">Obtiens un carré (4 cartes identiques) en un seul tirage</p>
+            <p class="subtitle">✨ Cartes 13, 21 et 24 sont ultra-rares ! ✨</p>
         </header>
 
         <div class="stats">
@@ -674,6 +727,8 @@
 
     <script>
         const TOTAL_CARD_TYPES = 28;
+        // Cartes ultra-rares (13, 21, 24) - la carte 22 n'est plus rare
+        const RARE_CARDS = [13, 21, 24];
         const cardImages = {
             1: 'https://i.ibb.co/r2kRpBqz/IMG-6174.png',
             2: 'https://i.ibb.co/TMdW3dZq/IMG-6173.png',
@@ -682,26 +737,26 @@
             5: 'https://i.ibb.co/4RJ0TCYh/IMG-6170.png',
             6: 'https://i.ibb.co/ymyr0ws7/IMG-6169.png',
             7: 'https://i.ibb.co/Dg4FYW5L/IMG-6168.png',
-            8: 'https://i.ibb.co/PzPSBNW0/IMG-6167.png',
-            9: 'https://i.ibb.co/F4WrT6Sb/IMG-6166.png',
+            8: 'https://i.ibb.co/ccJBN1SJ/IMG-6390-Photoroom.png',
+            9: 'https://i.ibb.co/xtnS66YC/IMG-6391-Photoroom.png',
             10: 'https://i.ibb.co/0pjVfMTt/IMG-6165.png',
             11: 'https://i.ibb.co/hRtd2JHD/IMG-6164.png',
-            12: 'https://i.ibb.co/RGbYnk5H/IMG-6163.png',
+            12: 'https://i.ibb.co/TqmtrswT/IMG-5993.png',
             13: 'https://i.ibb.co/hxXnkQh7/IMG-5861.png',
             14: 'https://i.ibb.co/kszc1xVw/IMG-5858.png',
             15: 'https://i.ibb.co/ZRFjM91q/IMG-5895.png',
-            16: 'https://i.ibb.co/VckYwyzJ/IMG-7367.png',
-            17: 'https://i.ibb.co/VpDXp5RL/IMG-7316.png',
+            16: 'https://i.ibb.co/tMrQbLQw/IMG-5948.png',
+            17: 'https://i.ibb.co/tpChkH7K/IMG-7309.png',
             18: 'https://i.ibb.co/20Lqxy75/IMG-7315.png',
             19: 'https://i.ibb.co/DD49PcmC/IMG-7314.png',
             20: 'https://i.ibb.co/zhDRD41r/IMG-7313.png',
             21: 'https://i.ibb.co/DHBNtX7t/IMG-6573.png',
-            22: 'https://i.ibb.co/dyvc8C3/IMG-6574.png',
+            22: 'https://i.ibb.co/mrqDQpy4/IMG-6395-Photoroom.png',
             23: 'https://i.ibb.co/2YpQxB1Y/IMG-6620.png',
             24: 'https://i.ibb.co/JR5SS5vd/IMG-6570.png',
             25: 'https://i.ibb.co/JjxRcYMW/IMG-5901.png',
-            26: 'https://i.ibb.co/qL1chxtM/IMG-5898.png',
-            27: 'https://i.ibb.co/V0zNBRgq/IMG-6834.png',
+            26: 'https://i.ibb.co/j9yGWypN/IMG-6388-Photoroom.png',
+            27: 'https://i.ibb.co/5XXqZ6G4/IMG-6389-Photoroom.png',
             28: 'https://i.ibb.co/0yVG7Kty/IMG-7312.png'
         };
 
@@ -710,6 +765,13 @@
             bronze: 0.01,  // 1% de chance
             silver: 0.03,  // 3% de chance
             gold: 0.08     // 8% de chance
+        };
+
+        // Probabilités des cartes rares par booster
+        const rareCardChances = {
+            bronze: 0.002,  // 0.2% de chance par carte (plus rare)
+            silver: 0.005,  // 0.5% de chance par carte
+            gold: 0.01      // 1% de chance par carte
         };
 
         let attempts = 0;
@@ -730,13 +792,25 @@
         function drawCards(count, boosterType) {
             const cards = [];
             const quadChance = boosterChances[boosterType];
+            const rareChance = rareCardChances[boosterType];
             
             // Vérifier si on doit forcer un carré selon la probabilité du booster
             const forceQuad = Math.random() < quadChance;
             
             if (forceQuad) {
                 // Forcer un carré (4 cartes identiques)
-                const quadCard = Math.floor(Math.random() * TOTAL_CARD_TYPES) + 1;
+                let quadCard;
+                
+                // Déterminer quelle carte sera le carré
+                if (Math.random() < rareChance * 5) { // Augmenter légèrement la chance d'avoir un carré rare
+                    // Choisir une carte rare pour le carré
+                    quadCard = RARE_CARDS[Math.floor(Math.random() * RARE_CARDS.length)];
+                } else {
+                    // Choisir une carte normale pour le carré
+                    do {
+                        quadCard = Math.floor(Math.random() * TOTAL_CARD_TYPES) + 1;
+                    } while (RARE_CARDS.includes(quadCard)); // Éviter les cartes rares pour les carrés normaux
+                }
                 
                 // Ajouter 4 cartes identiques
                 for (let i = 0; i < 4; i++) {
@@ -745,8 +819,7 @@
                 
                 // Ajouter le reste des cartes aléatoirement
                 for (let i = 4; i < count; i++) {
-                    const cardNum = Math.floor(Math.random() * TOTAL_CARD_TYPES) + 1;
-                    cards.push(cardNum);
+                    cards.push(drawSingleCard(rareChance));
                 }
                 
                 // Mélanger les cartes
@@ -754,10 +827,24 @@
             } else {
                 // Tirage normal
                 for (let i = 0; i < count; i++) {
-                    const cardNum = Math.floor(Math.random() * TOTAL_CARD_TYPES) + 1;
-                    cards.push(cardNum);
+                    cards.push(drawSingleCard(rareChance));
                 }
                 return cards;
+            }
+        }
+
+        function drawSingleCard(rareChance) {
+            // Déterminer si on tire une carte rare
+            if (Math.random() < rareChance) {
+                // Tirer une carte rare
+                return RARE_CARDS[Math.floor(Math.random() * RARE_CARDS.length)];
+            } else {
+                // Tirer une carte normale (en évitant les cartes rares)
+                let cardNum;
+                do {
+                    cardNum = Math.floor(Math.random() * TOTAL_CARD_TYPES) + 1;
+                } while (RARE_CARDS.includes(cardNum));
+                return cardNum;
             }
         }
 
@@ -845,8 +932,13 @@
                 setTimeout(() => {
                     const cardDiv = document.createElement('div');
                     cardDiv.className = 'card';
+                    
                     if (quadCard === cardNum) {
                         cardDiv.classList.add('is-quad');
+                    }
+                    
+                    if (RARE_CARDS.includes(cardNum)) {
+                        cardDiv.classList.add('is-rare');
                     }
                     
                     cardDiv.innerHTML = `
@@ -956,6 +1048,10 @@
                                 cardDiv.classList.add('is-quad');
                             }
                             
+                            if (RARE_CARDS.includes(cardNum)) {
+                                cardDiv.classList.add('is-rare');
+                            }
+                            
                             cardDiv.innerHTML = `
                                 <img src="${cardImages[cardNum]}" alt="Carte ${cardNum}">
                                 <div class="card-count">${cardCounts[cardNum]}x</div>
@@ -992,9 +1088,14 @@
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'collection-card';
                 
+                if (RARE_CARDS.includes(i)) {
+                    cardDiv.classList.add('rare');
+                }
+                
                 cardDiv.innerHTML = `
+                    ${RARE_CARDS.includes(i) ? '<div class="rare-indicator">RARE</div>' : ''}
                     <img src="${cardImages[i]}" alt="Carte ${i}">
-                    <div class="card-label">Carte ${i}</div>
+                    <div class="card-label ${RARE_CARDS.includes(i) ? 'rare' : ''}">Carte ${i}</div>
                 `;
                 
                 grid.appendChild(cardDiv);
