@@ -661,7 +661,7 @@
         <header>
             <h1>Jeu de Collection de Cartes</h1>
             <p class="subtitle">Obtiens un carré (4 cartes identiques) en un seul tirage</p>
-            <p class="subtitle">✨ Cartes 13, 21 et 24 sont ultra-rares ! ✨</p>
+            <p class="subtitle">✨ Cartes 13 et 21 sont ultra-rares ! ✨</p>
         </header>
 
         <div class="stats">
@@ -684,7 +684,7 @@
                 <img src="https://i.ibb.co/7JsBRrCn/IMG-5885.png" alt="Bronze" class="booster-image">
                 <h2>🥉 Bronze</h2>
                 <div class="info">4 cartes</div>
-                <div class="chance">Chance de carré: 1%</div>
+                <div class="chance">Chance de carré: 0.5%</div>
                 <div class="quantity-selector">
                     <button class="quantity-btn active" onclick="selectQuantity(this, 'bronze', 1)">1</button>
                     <button class="quantity-btn" onclick="selectQuantity(this, 'bronze', 5)">5</button>
@@ -699,20 +699,20 @@
                 <img src="https://i.ibb.co/20bnDRgP/IMG-5721.png" alt="Silver" class="booster-image">
                 <h2>🥈 Silver</h2>
                 <div class="info">5 cartes</div>
-                <div class="chance">Chance de carré: 3%</div>
+                <div class="chance">Chance de carré: 1.5%</div>
                 <button onclick="openBooster(5, 'Silver')">Ouvrir</button>
             </div>
             <div class="booster gold">
                 <img src="https://i.ibb.co/0pjVfMTt/IMG-6165.png" alt="Gold" class="booster-image">
                 <h2>🥇 Gold</h2>
                 <div class="info">7 cartes</div>
-                <div class="chance">Chance de carré: 8%</div>
+                <div class="chance">Chance de carré: 4%</div>
                 <button onclick="openBooster(7, 'Gold')">Ouvrir</button>
             </div>
         </div>
 
         <div class="collection">
-            <h2>📚 Galerie des 31 Cartes</h2>
+            <h2>📚 Galerie des 30 Cartes</h2>
             <div class="collection-grid" id="collectionGrid"></div>
         </div>
     </div>
@@ -726,9 +726,9 @@
     </div>
 
     <script>
-        const TOTAL_CARD_TYPES = 31;
-        // Cartes ultra-rares (13, 21, 24) - la carte 22 n'est plus rare
-        const RARE_CARDS = [13, 21, 24];
+        const TOTAL_CARD_TYPES = 30;
+        // Cartes ultra-rares (13, 21) - la carte 24 a été supprimée
+        const RARE_CARDS = [13, 21];
         const cardImages = {
             1: 'https://i.ibb.co/r2kRpBqz/IMG-6174.png',
             2: 'https://i.ibb.co/TMdW3dZq/IMG-6173.png',
@@ -753,26 +753,25 @@
             21: 'https://i.ibb.co/DHBNtX7t/IMG-6573.png',
             22: 'https://i.ibb.co/mrqDQpy4/IMG-6395-Photoroom.png',
             23: 'https://i.ibb.co/2YpQxB1Y/IMG-6620.png',
-            24: 'https://i.ibb.co/JR5SS5vd/IMG-6570.png',
-            25: 'https://i.ibb.co/JjxRcYMW/IMG-5901.png',
-            26: 'https://i.ibb.co/j9yGWypN/IMG-6388-Photoroom.png',
-            27: 'https://i.ibb.co/5XXqZ6G4/IMG-6389-Photoroom.png',
-            28: 'https://i.ibb.co/0yVG7Kty/IMG-7312.png',
-            29: 'https://i.ibb.co/FbXjBTNm/IMG-6426-Photoroom.png',
-            30: 'https://i.ibb.co/1t6HnnvW/IMG-6425-Photoroom.png',
-            31: 'https://i.ibb.co/2YcpSjpp/IMG-6424-Photoroom.png'
+            24: 'https://i.ibb.co/JjxRcYMW/IMG-5901.png',
+            25: 'https://i.ibb.co/j9yGWypN/IMG-6388-Photoroom.png',
+            26: 'https://i.ibb.co/5XXqZ6G4/IMG-6389-Photoroom.png',
+            27: 'https://i.ibb.co/0yVG7Kty/IMG-7312.png',
+            28: 'https://i.ibb.co/FbXjBTNm/IMG-6426-Photoroom.png',
+            29: 'https://i.ibb.co/1t6HnnvW/IMG-6425-Photoroom.png',
+            30: 'https://i.ibb.co/2YcpSjpp/IMG-6424-Photoroom.png'
         };
 
-        // Probabilités de carré par type de booster
+        // Probabilités de carré par type de booster (réduites)
         const boosterChances = {
-            bronze: 0.01,  // 1% de chance
-            silver: 0.03,  // 3% de chance
-            gold: 0.08     // 8% de chance
+            bronze: 0.005,  // 0.5% de chance (réduit de 1%)
+            silver: 0.015,  // 1.5% de chance (réduit de 3%)
+            gold: 0.04      // 4% de chance (réduit de 8%)
         };
 
         // Probabilités des cartes rares par booster
         const rareCardChances = {
-            bronze: 0.002,  // 0.2% de chance par carte (plus rare)
+            bronze: 0.002,  // 0.2% de chance par carte
             silver: 0.005,  // 0.5% de chance par carte
             gold: 0.01      // 1% de chance par carte
         };
