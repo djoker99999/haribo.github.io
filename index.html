@@ -729,6 +729,8 @@
         const TOTAL_CARD_TYPES = 30;
         // Cartes ultra-rares (13, 21) - la carte 24 a été supprimée
         const RARE_CARDS = [13, 21];
+        // Cartes pour l'alignement automatique
+        const ALIGNMENT_CARDS = [2, 12, 11, 9, 14, 15, 16, 17, 18, 19, 27, 29, 30];
         const cardImages = {
             1: 'https://i.ibb.co/r2kRpBqz/IMG-6174.png',
             2: 'https://i.ibb.co/TMdW3dZq/IMG-6173.png',
@@ -778,6 +780,8 @@
 
         let attempts = 0;
         let wins = 0;
+        let nextAlignment = 600;
+        let alignmentCounter = 0;
         let quantities = {
             bronze: 1,
             silver: 1,
@@ -797,9 +801,33 @@
             const rareChance = rareCardChances[boosterType];
             
             // Vérifier si on doit forcer un carré selon la probabilité du booster
-            const forceQuad = Math.random() < quadChance;
+            // MODIFICATION: On ne force jamais de carré naturellement
+            const forceQuad = false;
             
-            if (forceQuad) {
+            // Vérifier si on doit forcer un carré d'alignement
+            const forceAlignmentQuad = alignmentCounter >= nextAlignment;
+            
+            if (forceAlignmentQuad) {
+                // Forcer un carré d'alignement
+                const alignmentCard = ALIGNMENT_CARDS[Math.floor(Math.random() * ALIGNMENT_CARDS.length)];
+                
+                // Ajouter 4 cartes identiques
+                for (let i = 0; i < 4; i++) {
+                    cards.push(alignmentCard);
+                }
+                
+                // Ajouter le reste des cartes aléatoirement
+                for (let i = 4; i < count; i++) {
+                    cards.push(drawSingleCard(rareChance));
+                }
+                
+                // Réinitialiser le compteur d'alignement
+                alignmentCounter = 0;
+                nextAlignment = 600;
+                
+                // Mélanger les cartes
+                return shuffleArray(cards);
+            } else if (forceQuad) {
                 // Forcer un carré (4 cartes identiques)
                 let quadCard;
                 
@@ -880,6 +908,7 @@
             if (quantity === 1) {
                 // Tirage simple - affiche les cartes
                 attempts++;
+                alignmentCounter++;
                 const cards = drawCards(cardCount, boosterType);
                 const quadCard = checkForQuad(cards);
                 
@@ -896,6 +925,7 @@
                 
                 for (let i = 0; i < quantity; i++) {
                     attempts++;
+                    alignmentCounter++;
                     const cards = drawCards(cardCount, boosterType);
                     const quadCard = checkForQuad(cards);
                     
