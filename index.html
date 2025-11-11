@@ -106,11 +106,17 @@
             font-weight: bold;
         }
 
-        .boosters {
+        .boosters-container {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 30px;
             margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .boosters {
+            display: flex;
+            gap: 20px;
             flex-wrap: wrap;
         }
 
@@ -259,6 +265,61 @@
             color: white;
             border-color: #10ac84;
             box-shadow: 0 4px 15px rgba(16, 172, 132, 0.4);
+        }
+
+        .last-quad {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            min-width: 200px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 215, 0, 0.5);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .last-quad::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #feca57, #ffd700);
+            border-radius: 17px;
+            z-index: -1;
+            animation: quadGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        .last-quad h2 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            color: #ffd700;
+        }
+
+        .last-quad-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            border: 3px solid rgba(255, 215, 0, 0.5);
+        }
+
+        .last-quad .card-info {
+            font-size: 1.1em;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .last-quad .no-quad {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
         }
 
         .cards-reveal {
@@ -511,6 +572,16 @@
                 gap: 18px;
                 padding: 15px;
             }
+
+            .last-quad {
+                min-width: 180px;
+                padding: 20px;
+            }
+
+            .last-quad-image {
+                width: 100px;
+                height: 100px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -536,6 +607,11 @@
                 height: 140px;
             }
 
+            .boosters-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
             .boosters {
                 flex-direction: column;
                 align-items: center;
@@ -559,6 +635,17 @@
                 right: 15px;
                 padding: 10px 20px;
                 font-size: 1em;
+            }
+
+            .last-quad {
+                width: 100%;
+                max-width: 300px;
+                margin-top: 20px;
+            }
+
+            .last-quad-image {
+                width: 100px;
+                height: 100px;
             }
         }
 
@@ -679,35 +766,45 @@
             </div>
         </div>
 
-        <div class="boosters">
-            <div class="booster bronze">
-                <img src="https://i.ibb.co/7JsBRrCn/IMG-5885.png" alt="Bronze" class="booster-image">
-                <h2>🥉 Bronze</h2>
-                <div class="info">4 cartes</div>
-                <div class="chance">Chance de carré: 0.5%</div>
-                <div class="quantity-selector">
-                    <button class="quantity-btn active" onclick="selectQuantity(this, 'bronze', 1)">1</button>
-                    <button class="quantity-btn" onclick="selectQuantity(this, 'bronze', 5)">5</button>
-                    <button class="quantity-btn" onclick="selectQuantity(this, 'bronze', 10)">10</button>
-                    <button class="quantity-btn" onclick="selectQuantity(this, 'bronze', 30)">30</button>
-                    <button class="quantity-btn" onclick="selectQuantity(this, 'bronze', 50)">50</button>
-                    <button class="quantity-btn" onclick="selectQuantity(this, 'bronze', 100)">100</button>
+        <div class="boosters-container">
+            <div class="boosters">
+                <div class="booster bronze">
+                    <img src="https://i.ibb.co/7JsBRrCn/IMG-5885.png" alt="Bronze" class="booster-image">
+                    <h2>🥉 Bronze</h2>
+                    <div class="info">4 cartes</div>
+                    <div class="chance">Chance de carré: 0.5%</div>
+                    <div class="quantity-selector">
+                        <button class="quantity-btn active" onclick="selectQuantity(this, 'bronze', 1)">1</button>
+                        <button class="quantity-btn" onclick="selectQuantity(this, 'bronze', 5)">5</button>
+                        <button class="quantity-btn" onclick="selectQuantity(this, 'bronze', 10)">10</button>
+                        <button class="quantity-btn" onclick="selectQuantity(this, 'bronze', 30)">30</button>
+                        <button class="quantity-btn" onclick="selectQuantity(this, 'bronze', 50)">50</button>
+                        <button class="quantity-btn" onclick="selectQuantity(this, 'bronze', 100)">100</button>
+                    </div>
+                    <button onclick="openBooster(4, 'Bronze')">Ouvrir</button>
                 </div>
-                <button onclick="openBooster(4, 'Bronze')">Ouvrir</button>
+                <div class="booster silver">
+                    <img src="https://i.ibb.co/20bnDRgP/IMG-5721.png" alt="Silver" class="booster-image">
+                    <h2>🥈 Silver</h2>
+                    <div class="info">5 cartes</div>
+                    <div class="chance">Chance de carré: 1.5%</div>
+                    <button onclick="openBooster(5, 'Silver')">Ouvrir</button>
+                </div>
+                <div class="booster gold">
+                    <img src="https://i.ibb.co/0pjVfMTt/IMG-6165.png" alt="Gold" class="booster-image">
+                    <h2>🥇 Gold</h2>
+                    <div class="info">7 cartes</div>
+                    <div class="chance">Chance de carré: 4%</div>
+                    <button onclick="openBooster(7, 'Gold')">Ouvrir</button>
+                </div>
             </div>
-            <div class="booster silver">
-                <img src="https://i.ibb.co/20bnDRgP/IMG-5721.png" alt="Silver" class="booster-image">
-                <h2>🥈 Silver</h2>
-                <div class="info">5 cartes</div>
-                <div class="chance">Chance de carré: 1.5%</div>
-                <button onclick="openBooster(5, 'Silver')">Ouvrir</button>
-            </div>
-            <div class="booster gold">
-                <img src="https://i.ibb.co/0pjVfMTt/IMG-6165.png" alt="Gold" class="booster-image">
-                <h2>🥇 Gold</h2>
-                <div class="info">7 cartes</div>
-                <div class="chance">Chance de carré: 4%</div>
-                <button onclick="openBooster(7, 'Gold')">Ouvrir</button>
+            
+            <div class="last-quad">
+                <h2>🃏 Dernier Carré</h2>
+                <div id="lastQuadImage">
+                    <div class="no-quad">Aucun carré obtenu</div>
+                </div>
+                <div id="lastQuadInfo" class="card-info"></div>
             </div>
         </div>
 
@@ -782,6 +879,7 @@
         let wins = 0;
         let nextAlignment = 600;
         let alignmentCounter = 0;
+        let lastQuadCard = null;
         let quantities = {
             bronze: 1,
             silver: 1,
@@ -901,6 +999,27 @@
             return null;
         }
 
+        function updateLastQuad(cardNum) {
+            lastQuadCard = cardNum;
+            const lastQuadImage = document.getElementById('lastQuadImage');
+            const lastQuadInfo = document.getElementById('lastQuadInfo');
+            
+            if (cardNum) {
+                lastQuadImage.innerHTML = `<img src="${cardImages[cardNum]}" alt="Carte ${cardNum}" class="last-quad-image">`;
+                lastQuadInfo.textContent = `Carte ${cardNum}`;
+                
+                if (RARE_CARDS.includes(cardNum)) {
+                    lastQuadInfo.textContent += ' (RARE)';
+                    lastQuadInfo.style.color = '#ff00ff';
+                } else {
+                    lastQuadInfo.style.color = '#ffd700';
+                }
+            } else {
+                lastQuadImage.innerHTML = '<div class="no-quad">Aucun carré obtenu</div>';
+                lastQuadInfo.textContent = '';
+            }
+        }
+
         function openBooster(cardCount, boosterName) {
             const boosterType = boosterName.toLowerCase();
             const quantity = quantities[boosterType] || 1;
@@ -914,6 +1033,7 @@
                 
                 if (quadCard) {
                     wins++;
+                    updateLastQuad(quadCard);
                 }
                 
                 updateStats();
@@ -922,6 +1042,7 @@
                 // Tirages multiples - affiche tous les tirages
                 let totalWins = 0;
                 let allDraws = [];
+                let lastQuad = null;
                 
                 for (let i = 0; i < quantity; i++) {
                     attempts++;
@@ -932,9 +1053,14 @@
                     if (quadCard) {
                         wins++;
                         totalWins++;
+                        lastQuad = quadCard;
                     }
                     
                     allDraws.push({ cards, quadCard });
+                }
+                
+                if (lastQuad) {
+                    updateLastQuad(lastQuad);
                 }
                 
                 updateStats();
@@ -1136,6 +1262,7 @@
 
         updateStats();
         displayAllCards();
+        updateLastQuad(null);
     </script>
 </body>
 </html>
