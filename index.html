@@ -1,10 +1,3 @@
-J'ai modifié le code HTML, CSS et JavaScript pour ajouter un bouton de triche "Forcer Carré Aligné" qui permet de forcer le tirage d'un carré (4 cartes identiques) de la carte alignée de votre choix au prochain tirage.
-
-Le bouton est positionné discrètement en haut à droite de l'en-tête, et l'interface de sélection de la carte apparaît sous l'en-tête une fois activée.
-
-Voici le code complet, intégrant cette fonctionnalité :
-
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -543,22 +536,59 @@ Voici le code complet, intégrant cette fonctionnalité :
             background: linear-gradient(45deg, #feca57, #ff6b9d);
         }
 
-        /* Styles pour le bouton de triche */
+        /* Styles pour le panneau déplaçable de triche */
+        .cheat-panel {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            width: 320px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 3px solid #079992;
+            border-radius: 15px;
+            padding: 20px;
+            z-index: 999;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: move;
+        }
+
+        .cheat-panel:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        .cheat-panel.collapsed {
+            height: 50px;
+            overflow: hidden;
+        }
+
+        .cheat-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #079992;
+        }
+
+        .cheat-panel h3 {
+            color: #38ada9;
+            font-size: 1.3em;
+            margin: 0;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
         .cheat-toggle-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
             background: linear-gradient(45deg, #38ada9, #079992);
             color: white;
             border: 2px solid #fff;
-            padding: 10px 15px;
-            border-radius: 15px;
+            padding: 8px 15px;
+            border-radius: 12px;
             font-size: 0.9em;
             cursor: pointer;
             font-weight: bold;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
-            z-index: 100;
         }
 
         .cheat-toggle-btn:hover {
@@ -566,67 +596,92 @@ Voici le code complet, intégrant cette fonctionnalité :
             transform: scale(1.05);
         }
 
-        /* Styles pour le sélecteur de triche */
-        .cheat-selector {
-            background: rgba(0, 0, 0, 0.85);
-            border: 2px solid #079992;
-            padding: 15px;
-            border-radius: 15px;
-            margin-top: 10px;
-            text-align: center;
-            display: none;
+        .collapse-btn {
+            background: transparent;
+            color: #38ada9;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0 5px;
+            transition: all 0.3s ease;
+        }
+
+        .collapse-btn:hover {
+            color: #fff;
+            transform: scale(1.2);
+        }
+
+        .cheat-content {
+            display: flex;
             flex-direction: column;
             gap: 15px;
-            position: relative;
-            z-index: 99;
         }
 
-        .cheat-selector.active {
-            display: flex;
-        }
-
-        .cheat-selector label {
+        .cheat-content label {
             font-size: 1.1em;
             font-weight: bold;
             color: #38ada9;
+            text-align: center;
         }
 
-        .cheat-selector select {
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #079992;
+        .cheat-content select {
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #079992;
             background: #1a1a1a;
             color: white;
             font-size: 1em;
-            max-width: 300px;
-            align-self: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .cheat-selector button {
+        .cheat-content select:hover {
+            border-color: #38ada9;
+            box-shadow: 0 0 10px rgba(56, 173, 169, 0.5);
+        }
+
+        .cheat-content button {
             background: linear-gradient(45deg, #ff6b9d, #c44569);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border-radius: 20px;
-            font-size: 1em;
+            font-size: 1.1em;
             cursor: pointer;
             font-weight: bold;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
             transition: all 0.3s ease;
-            max-width: 200px;
-            align-self: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .cheat-selector button:hover {
+        .cheat-content button:hover {
             transform: scale(1.05);
             background: linear-gradient(45deg, #feca57, #ff6b9d);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
         }
 
         .cheat-status {
             font-size: 1em;
             font-weight: bold;
             color: #ffd700;
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
             margin-top: 10px;
+            display: none;
+        }
+
+        .cheat-status.active {
+            display: block;
+            animation: statusFadeIn 0.5s ease-out;
+        }
+
+        @keyframes statusFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 1024px) and (min-width: 769px) {
@@ -674,6 +729,11 @@ Voici le code complet, intégrant cette fonctionnalité :
             .last-quad-image {
                 width: 100px;
                 height: 100px;
+            }
+
+            .cheat-panel {
+                width: 300px;
+                right: 15px;
             }
         }
 
@@ -741,11 +801,10 @@ Voici le code complet, intégrant cette fonctionnalité :
                 height: 100px;
             }
 
-            .cheat-toggle-btn {
-                top: 5px;
-                right: 5px;
-                padding: 8px 12px;
-                font-size: 0.8em;
+            .cheat-panel {
+                width: 280px;
+                right: 10px;
+                top: 80px;
             }
         }
 
@@ -846,20 +905,10 @@ Voici le code complet, intégrant cette fonctionnalité :
 <body>
     <div class="container">
         <header>
-            <button class="cheat-toggle-btn" onclick="toggleCheatSelector()">
-                ✨ Forcer Carré Aligné
-            </button>
             <h1>Jeu de Collection de Cartes</h1>
             <p class="subtitle">Obtiens un carré (4 cartes identiques) en un seul tirage</p>
             <p class="subtitle">✨ Cartes 13 et 21 sont ultra-rares ! ✨</p>
         </header>
-
-        <div class="cheat-selector" id="cheatSelector">
-            <label for="alignedCardSelect">Carte à forcer au prochain tirage :</label>
-            <select id="alignedCardSelect"></select>
-            <button onclick="setForcedQuad()">Confirmer l'alignement</button>
-            <div id="cheatStatus" class="cheat-status" style="display: none;"></div>
-        </div>
 
         <div class="stats">
             <div class="stat-box">
@@ -921,6 +970,19 @@ Voici le code complet, intégrant cette fonctionnalité :
         <div class="collection">
             <h2>📚 Galerie des 30 Cartes</h2>
             <div class="collection-grid" id="collectionGrid"></div>
+        </div>
+    </div>
+
+    <div class="cheat-panel" id="cheatPanel">
+        <div class="cheat-panel-header">
+            <h3>✨ Forcer Carré Aligné</h3>
+            <button class="collapse-btn" onclick="toggleCheatPanel()">−</button>
+        </div>
+        <div class="cheat-content">
+            <label for="alignedCardSelect">Carte à forcer au prochain tirage :</label>
+            <select id="alignedCardSelect"></select>
+            <button onclick="setForcedQuad()">Confirmer l'alignement</button>
+            <div id="cheatStatus" class="cheat-status"></div>
         </div>
     </div>
 
@@ -996,6 +1058,62 @@ Voici le code complet, intégrant cette fonctionnalité :
         // Nouvelle variable pour la triche
         let forcedQuadCard = null;
 
+        // Fonctionnalité de déplacement du panneau
+        function makePanelDraggable(panel) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            
+            panel.onmousedown = dragMouseDown;
+            
+            function dragMouseDown(e) {
+                e = e || window.event;
+                // Empêcher le drag si on clique sur un bouton ou un select
+                if (e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT' || e.target.tagName === 'OPTION') {
+                    return;
+                }
+                e.preventDefault();
+                // Obtenir la position du curseur au démarrage
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                // Appeler une fonction chaque fois que le curseur se déplace
+                document.onmousemove = elementDrag;
+            }
+            
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                // Calculer la nouvelle position du curseur
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                // Définir la nouvelle position de l'élément
+                panel.style.top = (panel.offsetTop - pos2) + "px";
+                panel.style.left = (panel.offsetLeft - pos1) + "px";
+                panel.style.right = "auto";
+            }
+            
+            function closeDragElement() {
+                // Arrêter le déplacement lorsque le bouton de la souris est relâché
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        // Fonction pour basculer l'affichage du panneau (réduire/agrandir)
+        function toggleCheatPanel() {
+            const panel = document.getElementById('cheatPanel');
+            const btn = panel.querySelector('.collapse-btn');
+            
+            if (panel.classList.contains('collapsed')) {
+                panel.classList.remove('collapsed');
+                btn.textContent = '−';
+            } else {
+                panel.classList.add('collapsed');
+                btn.textContent = '+';
+            }
+        }
+
         // Fonction pour remplir le sélecteur de cartes pour la triche
         function populateCardSelector() {
             const select = document.getElementById('alignedCardSelect');
@@ -1008,22 +1126,18 @@ Voici le code complet, intégrant cette fonctionnalité :
             }
         }
 
-        // Fonction pour basculer l'affichage du sélecteur de triche
-        function toggleCheatSelector() {
-            const selector = document.getElementById('cheatSelector');
-            selector.classList.toggle('active');
-        }
-
         // Fonction pour définir la carte à forcer
         function setForcedQuad() {
             const select = document.getElementById('alignedCardSelect');
             forcedQuadCard = parseInt(select.value);
             const statusDiv = document.getElementById('cheatStatus');
             statusDiv.textContent = `Carré forcé au prochain tirage : Carte ${forcedQuadCard}${RARE_CARDS.includes(forcedQuadCard) ? ' (RARE)' : ''}`;
-            statusDiv.style.display = 'block';
+            statusDiv.classList.add('active');
             
-            // On peut masquer le sélecteur après la confirmation si on veut
-            // document.getElementById('cheatSelector').classList.remove('active'); 
+            // Masquer le message après 5 secondes
+            setTimeout(() => {
+                statusDiv.classList.remove('active');
+            }, 5000);
         }
 
         function selectQuantity(btn, boosterType, quantity) {
@@ -1037,15 +1151,17 @@ Voici le code complet, intégrant cette fonctionnalité :
             const cards = [];
             const rareChance = rareCardChances[boosterType];
             
-            // Vérifier si un carré est forcé pour le prochain tirage (pour le tirage simple uniquement)
-            const isSingleDraw = quantities[boosterType.toLowerCase()] === 1;
+            // *** CORRECTION ***
+            // La vérification "isSingleDraw" a été supprimée.
+            // La triche s'applique au premier tirage, quelle que soit la quantité sélectionnée.
+            
             let currentForcedQuad = null;
 
-            if (isSingleDraw && forcedQuadCard !== null) {
+            if (forcedQuadCard !== null) {
                 currentForcedQuad = forcedQuadCard;
                 // Réinitialiser après l'utilisation
                 forcedQuadCard = null;
-                document.getElementById('cheatStatus').style.display = 'none';
+                document.getElementById('cheatStatus').classList.remove('active');
             }
             
             if (currentForcedQuad) {
@@ -1135,16 +1251,15 @@ Voici le code complet, intégrant cette fonctionnalité :
             const boosterType = boosterName.toLowerCase();
             const quantity = quantities[boosterType] || 1;
             
-            // Si c'est un tirage multiple, on ignore la triche forcée car elle est prévue pour un seul tirage à la fois
+            // Si c'est un tirage multiple, on prévient que la triche sera utilisée au premier tirage
             if (quantity > 1 && forcedQuadCard !== null) {
-                alert("Attention: Le mode 'Forcer Carré Aligné' n'est actif que pour les tirages uniques (quantité de 1). Le carré forcé sera consommé au premier tirage si vous continuez. Voulez-vous continuer ?");
-                // On pourrait réinitialiser forcedQuadCard ici, mais le mieux est de laisser le drawCards gérer sa consommation.
+                alert("Attention: Le mode 'Forcer Carré Aligné' sera consommé lors du premier des " + quantity + " tirages.");
             }
 
             if (quantity === 1) {
                 // Tirage simple - affiche les cartes
                 attempts++;
-                const cards = drawCards(cardCount, boosterType);
+                const cards = drawCards(cardCount, boosterType); // drawCards gère la triche
                 const quadCard = checkForQuad(cards);
                 
                 if (quadCard) {
@@ -1162,7 +1277,7 @@ Voici le code complet, intégrant cette fonctionnalité :
                 
                 for (let i = 0; i < quantity; i++) {
                     attempts++;
-                    // Note: drawCards gérera forcedQuadCard pour le premier tirage seulement si on a choisi la triche
+                    // drawCards gérera forcedQuadCard pour le premier tirage (i=0)
                     const cards = drawCards(cardCount, boosterType); 
                     const quadCard = checkForQuad(cards);
                     
@@ -1381,7 +1496,10 @@ Voici le code complet, intégrant cette fonctionnalité :
         displayAllCards();
         updateLastQuad(null);
         populateCardSelector(); // Remplir le sélecteur au chargement
+        
+        // Rendre le panneau déplaçable
+        const cheatPanel = document.getElementById('cheatPanel');
+        makePanelDraggable(cheatPanel);
     </script>
 </body>
 </html>
-```
