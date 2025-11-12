@@ -1,3 +1,10 @@
+J'ai modifié le code HTML, CSS et JavaScript pour ajouter un bouton de triche "Forcer Carré Aligné" qui permet de forcer le tirage d'un carré (4 cartes identiques) de la carte alignée de votre choix au prochain tirage.
+
+Le bouton est positionné discrètement en haut à droite de l'en-tête, et l'interface de sélection de la carte apparaît sous l'en-tête une fois activée.
+
+Voici le code complet, intégrant cette fonctionnalité :
+
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -536,6 +543,92 @@
             background: linear-gradient(45deg, #feca57, #ff6b9d);
         }
 
+        /* Styles pour le bouton de triche */
+        .cheat-toggle-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(45deg, #38ada9, #079992);
+            color: white;
+            border: 2px solid #fff;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .cheat-toggle-btn:hover {
+            background: linear-gradient(45deg, #079992, #38ada9);
+            transform: scale(1.05);
+        }
+
+        /* Styles pour le sélecteur de triche */
+        .cheat-selector {
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #079992;
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            z-index: 99;
+        }
+
+        .cheat-selector.active {
+            display: flex;
+        }
+
+        .cheat-selector label {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #38ada9;
+        }
+
+        .cheat-selector select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #079992;
+            background: #1a1a1a;
+            color: white;
+            font-size: 1em;
+            max-width: 300px;
+            align-self: center;
+        }
+
+        .cheat-selector button {
+            background: linear-gradient(45deg, #ff6b9d, #c44569);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            max-width: 200px;
+            align-self: center;
+        }
+
+        .cheat-selector button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #feca57, #ff6b9d);
+        }
+
+        .cheat-status {
+            font-size: 1em;
+            font-weight: bold;
+            color: #ffd700;
+            margin-top: 10px;
+        }
+
         @media (max-width: 1024px) and (min-width: 769px) {
             .container {
                 max-width: 95%;
@@ -647,6 +740,13 @@
                 width: 100px;
                 height: 100px;
             }
+
+            .cheat-toggle-btn {
+                top: 5px;
+                right: 5px;
+                padding: 8px 12px;
+                font-size: 0.8em;
+            }
         }
 
         .collection {
@@ -746,10 +846,20 @@
 <body>
     <div class="container">
         <header>
+            <button class="cheat-toggle-btn" onclick="toggleCheatSelector()">
+                ✨ Forcer Carré Aligné
+            </button>
             <h1>Jeu de Collection de Cartes</h1>
             <p class="subtitle">Obtiens un carré (4 cartes identiques) en un seul tirage</p>
             <p class="subtitle">✨ Cartes 13 et 21 sont ultra-rares ! ✨</p>
         </header>
+
+        <div class="cheat-selector" id="cheatSelector">
+            <label for="alignedCardSelect">Carte à forcer au prochain tirage :</label>
+            <select id="alignedCardSelect"></select>
+            <button onclick="setForcedQuad()">Confirmer l'alignement</button>
+            <div id="cheatStatus" class="cheat-status" style="display: none;"></div>
+        </div>
 
         <div class="stats">
             <div class="stat-box">
@@ -826,7 +936,7 @@
         const TOTAL_CARD_TYPES = 30;
         // Cartes ultra-rares (13, 21) - la carte 24 a été supprimée
         const RARE_CARDS = [13, 21];
-        // Cartes pour l'alignement automatique
+        // Cartes pour l'alignement automatique (anciennement)
         const ALIGNMENT_CARDS = [2, 12, 11, 9, 14, 15, 16, 17, 18, 19, 27, 29, 30];
         const cardImages = {
             1: 'https://i.ibb.co/r2kRpBqz/IMG-6174.png',
@@ -863,9 +973,9 @@
 
         // Probabilités de carré par type de booster (réduites)
         const boosterChances = {
-            bronze: 0.005,  // 0.5% de chance (réduit de 1%)
-            silver: 0.015,  // 1.5% de chance (réduit de 3%)
-            gold: 0.04      // 4% de chance (réduit de 8%)
+            bronze: 0.005,  // 0.5% de chance
+            silver: 0.015,  // 1.5% de chance
+            gold: 0.04      // 4% de chance
         };
 
         // Probabilités des cartes rares par booster
@@ -877,14 +987,44 @@
 
         let attempts = 0;
         let wins = 0;
-        let nextAlignment = 600;
-        let alignmentCounter = 0;
         let lastQuadCard = null;
         let quantities = {
             bronze: 1,
             silver: 1,
             gold: 1
         };
+        // Nouvelle variable pour la triche
+        let forcedQuadCard = null;
+
+        // Fonction pour remplir le sélecteur de cartes pour la triche
+        function populateCardSelector() {
+            const select = document.getElementById('alignedCardSelect');
+            select.innerHTML = '';
+            for (let i = 1; i <= TOTAL_CARD_TYPES; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Carte ${i}${RARE_CARDS.includes(i) ? ' (RARE)' : ''}`;
+                select.appendChild(option);
+            }
+        }
+
+        // Fonction pour basculer l'affichage du sélecteur de triche
+        function toggleCheatSelector() {
+            const selector = document.getElementById('cheatSelector');
+            selector.classList.toggle('active');
+        }
+
+        // Fonction pour définir la carte à forcer
+        function setForcedQuad() {
+            const select = document.getElementById('alignedCardSelect');
+            forcedQuadCard = parseInt(select.value);
+            const statusDiv = document.getElementById('cheatStatus');
+            statusDiv.textContent = `Carré forcé au prochain tirage : Carte ${forcedQuadCard}${RARE_CARDS.includes(forcedQuadCard) ? ' (RARE)' : ''}`;
+            statusDiv.style.display = 'block';
+            
+            // On peut masquer le sélecteur après la confirmation si on veut
+            // document.getElementById('cheatSelector').classList.remove('active'); 
+        }
 
         function selectQuantity(btn, boosterType, quantity) {
             const parent = btn.parentElement;
@@ -895,54 +1035,25 @@
 
         function drawCards(count, boosterType) {
             const cards = [];
-            const quadChance = boosterChances[boosterType];
             const rareChance = rareCardChances[boosterType];
             
-            // Vérifier si on doit forcer un carré selon la probabilité du booster
-            // MODIFICATION: On ne force jamais de carré naturellement
-            const forceQuad = false;
+            // Vérifier si un carré est forcé pour le prochain tirage (pour le tirage simple uniquement)
+            const isSingleDraw = quantities[boosterType.toLowerCase()] === 1;
+            let currentForcedQuad = null;
+
+            if (isSingleDraw && forcedQuadCard !== null) {
+                currentForcedQuad = forcedQuadCard;
+                // Réinitialiser après l'utilisation
+                forcedQuadCard = null;
+                document.getElementById('cheatStatus').style.display = 'none';
+            }
             
-            // Vérifier si on doit forcer un carré d'alignement
-            const forceAlignmentQuad = alignmentCounter >= nextAlignment;
-            
-            if (forceAlignmentQuad) {
-                // Forcer un carré d'alignement
-                const alignmentCard = ALIGNMENT_CARDS[Math.floor(Math.random() * ALIGNMENT_CARDS.length)];
+            if (currentForcedQuad) {
+                // Forcer un carré de la carte sélectionnée
                 
                 // Ajouter 4 cartes identiques
                 for (let i = 0; i < 4; i++) {
-                    cards.push(alignmentCard);
-                }
-                
-                // Ajouter le reste des cartes aléatoirement
-                for (let i = 4; i < count; i++) {
-                    cards.push(drawSingleCard(rareChance));
-                }
-                
-                // Réinitialiser le compteur d'alignement
-                alignmentCounter = 0;
-                nextAlignment = 600;
-                
-                // Mélanger les cartes
-                return shuffleArray(cards);
-            } else if (forceQuad) {
-                // Forcer un carré (4 cartes identiques)
-                let quadCard;
-                
-                // Déterminer quelle carte sera le carré
-                if (Math.random() < rareChance * 5) { // Augmenter légèrement la chance d'avoir un carré rare
-                    // Choisir une carte rare pour le carré
-                    quadCard = RARE_CARDS[Math.floor(Math.random() * RARE_CARDS.length)];
-                } else {
-                    // Choisir une carte normale pour le carré
-                    do {
-                        quadCard = Math.floor(Math.random() * TOTAL_CARD_TYPES) + 1;
-                    } while (RARE_CARDS.includes(quadCard)); // Éviter les cartes rares pour les carrés normaux
-                }
-                
-                // Ajouter 4 cartes identiques
-                for (let i = 0; i < 4; i++) {
-                    cards.push(quadCard);
+                    cards.push(currentForcedQuad);
                 }
                 
                 // Ajouter le reste des cartes aléatoirement
@@ -1024,10 +1135,15 @@
             const boosterType = boosterName.toLowerCase();
             const quantity = quantities[boosterType] || 1;
             
+            // Si c'est un tirage multiple, on ignore la triche forcée car elle est prévue pour un seul tirage à la fois
+            if (quantity > 1 && forcedQuadCard !== null) {
+                alert("Attention: Le mode 'Forcer Carré Aligné' n'est actif que pour les tirages uniques (quantité de 1). Le carré forcé sera consommé au premier tirage si vous continuez. Voulez-vous continuer ?");
+                // On pourrait réinitialiser forcedQuadCard ici, mais le mieux est de laisser le drawCards gérer sa consommation.
+            }
+
             if (quantity === 1) {
                 // Tirage simple - affiche les cartes
                 attempts++;
-                alignmentCounter++;
                 const cards = drawCards(cardCount, boosterType);
                 const quadCard = checkForQuad(cards);
                 
@@ -1046,8 +1162,8 @@
                 
                 for (let i = 0; i < quantity; i++) {
                     attempts++;
-                    alignmentCounter++;
-                    const cards = drawCards(cardCount, boosterType);
+                    // Note: drawCards gérera forcedQuadCard pour le premier tirage seulement si on a choisi la triche
+                    const cards = drawCards(cardCount, boosterType); 
                     const quadCard = checkForQuad(cards);
                     
                     if (quadCard) {
@@ -1260,9 +1376,12 @@
             }
         }
 
+        // Initialisation
         updateStats();
         displayAllCards();
         updateLastQuad(null);
+        populateCardSelector(); // Remplir le sélecteur au chargement
     </script>
 </body>
 </html>
+```
