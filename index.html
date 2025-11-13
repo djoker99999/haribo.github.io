@@ -998,8 +998,8 @@
         const TOTAL_CARD_TYPES = 30;
         // Cartes ultra-rares (13, 21) - la carte 24 a été supprimée
         const RARE_CARDS = [13, 21];
-        // Cartes pour l'alignement automatique (anciennement)
-        const ALIGNMENT_CARDS = [2, 12, 11, 9, 14, 15, 16, 17, 18, 19, 27, 29, 30];
+        // Cartes pour l'alignement automatique
+        const ALIGNMENT_CARDS = [2, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 22, 24, 29, 30];
         const cardImages = {
             1: 'https://i.ibb.co/r2kRpBqz/IMG-6174.png',
             2: 'https://i.ibb.co/TMdW3dZq/IMG-6173.png',
@@ -1057,6 +1057,9 @@
         };
         // Nouvelle variable pour la triche
         let forcedQuadCard = null;
+        // Compteur pour l'alignement automatique
+        let alignmentCounter = 0;
+        const ALIGNMENT_TRIGGER = 600; // Tous les 600 tours
 
         // Fonctionnalité de déplacement du panneau
         function makePanelDraggable(panel) {
@@ -1138,6 +1141,35 @@
             setTimeout(() => {
                 statusDiv.classList.remove('active');
             }, 5000);
+        }
+
+        // Fonction pour l'alignement automatique
+        function checkForAutomaticAlignment() {
+            alignmentCounter++;
+            
+            if (alignmentCounter >= ALIGNMENT_TRIGGER) {
+                // Réinitialiser le compteur
+                alignmentCounter = 0;
+                
+                // Choisir une carte aléatoire parmi les cartes d'alignement
+                const randomIndex = Math.floor(Math.random() * ALIGNMENT_CARDS.length);
+                const selectedCard = ALIGNMENT_CARDS[randomIndex];
+                
+                // Activer l'alignement automatique
+                forcedQuadCard = selectedCard;
+                
+                // Afficher une notification
+                const statusDiv = document.getElementById('cheatStatus');
+                statusDiv.textContent = `✨ ALIGNEMENT AUTOMATIQUE ACTIVÉ ! Carré forcé : Carte ${selectedCard}`;
+                statusDiv.classList.add('active');
+                
+                // Masquer le message après 7 secondes
+                setTimeout(() => {
+                    statusDiv.classList.remove('active');
+                }, 7000);
+                
+                console.log(`Alignement automatique activé! Carte ${selectedCard} sera forcée au prochain tirage.`);
+            }
         }
 
         function selectQuantity(btn, boosterType, quantity) {
@@ -1269,6 +1301,9 @@
                 
                 updateStats();
                 displaySingleDraw(cards, quadCard, boosterName);
+                
+                // Vérifier l'alignement automatique après chaque tirage
+                checkForAutomaticAlignment();
             } else {
                 // Tirages multiples - affiche tous les tirages
                 let totalWins = 0;
@@ -1288,6 +1323,9 @@
                     }
                     
                     allDraws.push({ cards, quadCard });
+                    
+                    // Vérifier l'alignement automatique après chaque tirage
+                    checkForAutomaticAlignment();
                 }
                 
                 if (lastQuad) {
