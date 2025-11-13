@@ -1183,10 +1183,7 @@
             const cards = [];
             const rareChance = rareCardChances[boosterType];
             
-            // *** CORRECTION ***
-            // La vérification "isSingleDraw" a été supprimée.
-            // La triche s'applique au premier tirage, quelle que soit la quantité sélectionnée.
-            
+            // La triche s'applique au premier tirage, quelle que soit la quantité sélectionnée
             let currentForcedQuad = null;
 
             if (forcedQuadCard !== null) {
@@ -1283,11 +1280,6 @@
             const boosterType = boosterName.toLowerCase();
             const quantity = quantities[boosterType] || 1;
             
-            // Si c'est un tirage multiple, on prévient que la triche sera utilisée au premier tirage
-            if (quantity > 1 && forcedQuadCard !== null) {
-                alert("Attention: Le mode 'Forcer Carré Aligné' sera consommé lors du premier des " + quantity + " tirages.");
-            }
-
             if (quantity === 1) {
                 // Tirage simple - affiche les cartes
                 attempts++;
