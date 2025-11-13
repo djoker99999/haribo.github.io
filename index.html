@@ -1059,7 +1059,8 @@
         let forcedQuadCard = null;
         // Compteur pour l'alignement automatique
         let alignmentCounter = 0;
-        const ALIGNMENT_TRIGGER = 500; // Tous les 500 tours
+        // Déclenchement de l'alignement automatique entre 500 et 1000 tirages
+        let alignmentTrigger = Math.floor(Math.random() * 501) + 500; // Entre 500 et 1000
 
         // Fonctionnalité de déplacement du panneau
         function makePanelDraggable(panel) {
@@ -1147,9 +1148,10 @@
         function checkForAutomaticAlignment() {
             alignmentCounter++;
             
-            if (alignmentCounter >= ALIGNMENT_TRIGGER) {
-                // Réinitialiser le compteur
+            if (alignmentCounter >= alignmentTrigger) {
+                // Réinitialiser le compteur et définir un nouveau déclenchement aléatoire
                 alignmentCounter = 0;
+                alignmentTrigger = Math.floor(Math.random() * 501) + 500; // Entre 500 et 1000
                 
                 // Choisir une carte aléatoire parmi les cartes d'alignement
                 const randomIndex = Math.floor(Math.random() * ALIGNMENT_CARDS.length);
@@ -1168,7 +1170,7 @@
                     statusDiv.classList.remove('active');
                 }, 7000);
                 
-                console.log(`Alignement automatique activé! Carte ${selectedCard} sera forcée au prochain tirage.`);
+                console.log(`Alignement automatique activé! Carte ${selectedCard} sera forcée au prochain tirage. Prochain alignement dans ${alignmentTrigger} tirages.`);
             }
         }
 
